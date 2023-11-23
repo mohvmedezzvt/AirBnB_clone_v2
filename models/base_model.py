@@ -16,13 +16,17 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
-        for key, value in kwargs.items():
-            if key != "__class__":
-                setattr(self, key, value)
-        if not self.id:
+        if kwargs:
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    if key == 'updated_at' or key == 'created_at':
+                        self.__dict__[key] = datetime.fromisoformat(value)
+                    else:
+                        self.__dict__[key] = value
+        else:
             self.id = str(uuid.uuid4())
-        if not self.created_at:
-            self.created_at = self.updated_at = datetime.utcnow()
+            self.created_at = self.updated_at = datetime.now()
+
 
     def __str__(self):
         """Returns a string representation of the instance"""
@@ -43,7 +47,7 @@ class BaseModel:
                           (str(type(self)).split('.')[-1]).split('\'')[0]})
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
-        if '_sa_instance_state' in dictionary:
+        if '_sa_instance_state' in dictionary.keys():
             del dictionary['_sa_instance_state']
         return dictionary
 
