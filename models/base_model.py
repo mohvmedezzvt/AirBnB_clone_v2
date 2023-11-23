@@ -8,6 +8,7 @@ import models
 
 Base = declarative_base()
 
+
 class BaseModel:
     """A base class for all hbnb models"""
     id = Column(String(60), nullable=False, primary_key=True)
@@ -26,7 +27,6 @@ class BaseModel:
         else:
             self.id = str(uuid.uuid4())
             self.created_at = self.updated_at = datetime.now()
-
 
     def __str__(self):
         """Returns a string representation of the instance"""
@@ -54,4 +54,3 @@ class BaseModel:
     def delete(self):
         """Delete the current instance from the storage"""
         models.storage.delete(self)
-

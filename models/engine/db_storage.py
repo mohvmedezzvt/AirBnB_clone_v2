@@ -12,6 +12,7 @@ from models.place import Place
 from models.review import Review
 from models.amenity import Amenity
 
+
 class DBStorage():
     """DB Storage Class"""
 
@@ -28,22 +29,23 @@ class DBStorage():
                                       pool_pre_ping=True)
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
-        
+
     def all(self, cls=None):
         """Query on current database session"""
         if cls is None:
-            query = self.__session.query(State, City, User, Place, Review, Amenity)
+            query = self.__session.query(
+                State, City, User, Place, Review, Amenity)
             result = query.all()
             return result
         else:
             query = self.__session.query(cls)
             result = query.all()
             return result
-        
+
     def new(self, obj):
         """Add the object to current database session"""
         self.__session.add(obj)
-    
+
     def save(self):
         """Commit all changes of current database session"""
         self.__session.commit()
