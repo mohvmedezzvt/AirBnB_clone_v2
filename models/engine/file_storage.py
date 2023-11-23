@@ -14,7 +14,7 @@ class FileStorage:
             return self.__objects
         else:
             return {k: v for k, v in self.__objects.items()
-                     if type(v) == cls}
+                     if isinstance(v, cls)}
         # return FileStorage.__objects
 
     def new(self, obj):
@@ -56,13 +56,12 @@ class FileStorage:
 
     def delete(self, obj=None):
         """Delete obj from __objects if it's inside"""
-        if obj is None:
-            return
-        key = obj.__class__.__name__ + '.' + obj.id
-        if key in self.__objects:
-            del self.__objects[key]
-            self.save()
+        if obj:
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]
+                self.save()
 
     def close(self):
-        """Reloads the JSON file to objects"""
+        """Reload JSON file to objects"""
         self.reload()
