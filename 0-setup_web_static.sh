@@ -13,7 +13,7 @@ sudo echo "<html>
   <body>
     Holberton School
   </body>
-</html>" > /data/web_static/releases/test/index.html
+</html>" | sudo tee /data/web_static/releases/test/index.html
 # Create or recreate the symbolic link /data/web_static/current linked to the /data/web_static/releases/test/ folder
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 # Give ownership of the /data/ folder to the ubuntu user AND group
