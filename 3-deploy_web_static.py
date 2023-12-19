@@ -72,4 +72,5 @@ def deploy():
     archive_path = do_pack()
     if archive_path is None:
         return False
-    return do_deploy(archive_path)
+    tar_file = do_deploy(archive_path)
+    return tar_file
