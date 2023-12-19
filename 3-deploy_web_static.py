@@ -26,28 +26,45 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """ Distributes an archive to your web servers. """
+    """Deploys an archive"""
     if not os.path.exists(archive_path):
         return False
-    try:
-        file_name = archive_path.split("/")[-1]
-        file_name_no_ext = file_name.split(".")[0]
-        put(archive_path, "/tmp/{}".format(file_name))
-        run("mkdir -p /data/web_static/releases/{}/".format(file_name_no_ext))
-        run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
-            .format(file_name, file_name_no_ext))
-        run("rm /tmp/{}".format(file_name))
-        run("mv /data/web_static/releases/{}/web_static/* \
-            /data/web_static/releases/{}/"
-            .format(file_name_no_ext, file_name_no_ext))
-        run("rm -rf /data/web_static/releases/{}/web_static"
-            .format(file_name_no_ext))
-        run("rm -rf /data/web_static/current")
-        run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-            .format(file_name_no_ext))
-        return True
-    except Exception:
+    arch = archive_path.split('/')[1]
+    name = arch.split('.')[0]
+    tar_file = put(archive_path, '/tmp/{}'.format(arch))
+    if tar_file.failed:
         return False
+    tar_file = run('mkdir -p /data/web_static/releases/{}'.format(name))
+    if tar_file.failed:
+        return False
+    tar_file = run(
+        'tar -xzf /tmp/{} -C /data/web_static/releases/{}/'
+        .format(arch, name))
+    if tar_file.failed:
+        return False
+    tar_file = run('rm /tmp/{}'.format(arch))
+    if tar_file.failed:
+        return False
+    comp = 'mv /data/web_static/releases/{0}/web_static/*'
+    comp += ' /data/web_static/releases/{0}/'
+    tar_file = run(comp.format(name))
+    if tar_file.failed:
+        return False
+    tar_file = run(
+        'rm -rf /data/web_static/releases/{}/web_static'
+        .format(name))
+    if tar_file.failed:
+        return False
+    tar_file = run('rm -rf /data/web_static/current')
+    if tar_file.failed:
+        return False
+    tar_file = run(
+        'ln -s /data/web_static/releases/{}/ /data/web_static/current'
+        .format(name))
+    if tar_file.failed:
+        return False
+    print('New version deployed!')
+    return True
 
 
 def deploy():
