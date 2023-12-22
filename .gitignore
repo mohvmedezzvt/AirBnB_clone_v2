@@ -1,4 +1,6 @@
+.gitignore
 *.pyc 
 __pycache__
-.gitignore
 test_console-main.py
+venv/
+versions/
