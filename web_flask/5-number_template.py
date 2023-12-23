@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ This module defines a simple Flask application. """
 from flask import Flask, render_template
-app = Flask(__name__)
+app = Flask(__name__, template_folder='../templates')
 
 
 @app.route("/", strict_slashes=False)
