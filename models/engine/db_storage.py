@@ -1,16 +1,20 @@
 #!/usr/bin/python3
 """DB Storage Engine"""
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
-from os import getenv
-from models.base_model import Base
+from models.base_model import BaseModel, Base
+from models.user import User
 from models.state import State
 from models.city import City
-from models.user import User
+from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
-from models.amenity import Amenity
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm.session import sessionmaker, Session
+from os import getenv
+
+all_classes = {'State': State, 'City': City,
+               'User': User, 'Place': Place,
+               'Review': Review, 'Amenity': Amenity}
 
 
 class DBStorage():
@@ -32,15 +36,19 @@ class DBStorage():
 
     def all(self, cls=None):
         """Query on current database session"""
-        if cls is None:
-            query = self.__session.query(
-                State, City, User, Place, Review, Amenity)
-            result = query.all()
-            return result
+        obj_dict = {}
+
+        if cls:
+            for row in self.__session.query(cls).all():
+                # populate dict with objects from storage
+                obj_dict.update({'{}.{}'.
+                                format(type(cls).__name__, row.id,): row})
         else:
-            query = self.__session.query(cls)
-            result = query.all()
-            return result
+            for key, val in all_classes.items():
+                for row in self.__session.query(val):
+                    obj_dict.update({'{}.{}'.
+                                    format(type(row).__name__, row.id,): row})
+        return obj_dict
 
     def new(self, obj):
         """Add the object to current database session"""
@@ -52,17 +60,17 @@ class DBStorage():
 
     def delete(self, obj=None):
         """Delete from current database session"""
-        if obj is not None:
-            self.__session.delete(obj)
+        if obj:
+            self.session.delete(obj)
 
     def reload(self):
         """Create all tables in the database"""
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
+        session = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
-        Session = scoped_session(session_factory)
-        self.__session = Session()
+        # Session = scoped_session(session)
+        self.__session = scoped_session(session)
 
     def close(self):
         """Close current session"""
-        self.__session.close()
+        self.__session.remove()

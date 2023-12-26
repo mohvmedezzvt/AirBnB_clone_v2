@@ -138,7 +138,8 @@ class HBNBCommand(cmd.Cmd):
                 value = value.strip('"').replace("_", " ")
             else:
                 try:
-                    # Try to evaluate the value (handle cases like integers, floats, etc.)
+                    # Try to evaluate the value (handle cases like integers,
+                    # floats, etc.)
                     value = eval(value)
                 except Exception:
                     print(f"** coudn't evaluate {value} **")

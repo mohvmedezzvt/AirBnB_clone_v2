@@ -1,19 +1,20 @@
 #!/usr/bin/python3
 """Module for HBNB project """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Float, Integer, ForeignKey, Table
 from sqlalchemy.orm import relationship
-import os
-from models.review import Review
-from models.amenity import Amenity
+from os import getenv
+import models
+import shlex
 
 
 place_amenity = Table(
     'place_amenity', Base.metadata,
     Column('place_id', String(60), ForeignKey('places.id'),
-           primary_key=True),
+           primary_key=True, nullable=False),
     Column('amenity_id', String(60), ForeignKey('amenities.id'),
-           primary_key=True)
+           primary_key=True, nullable=False)
 )
 
 
@@ -32,28 +33,39 @@ class Place(BaseModel, Base):
     latitude = Column(Float)
     longitude = Column(Float)
     amenity_ids = []
-    reviews = relationship("Review", backref="place",
-                           cascade="all, delete-orphan")
-    amenities = relationship(
-        "Amenity", secondary=place_amenity, viewonly=False)
-    if os.environ['HBNB_ENV'] != 'db':
+
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        reviews = relationship("Review", backref="place",
+                               cascade="all, delete, delete-orphan")
+        amenities = relationship(
+            "Amenity", secondary=place_amenity,
+            viewonly=False, back_populates="place_amenities")
+    else:
         @property
         def reviews(self):
-            """Getter method to retrieve related Review instances."""
-            from models import storage
-            dic = storage.all('Review')
-            return [].append(v for k,
-                             v in dic.items() if self.id == v['place_id'])
+            """ getter returns list of reviews """
+            var = models.storage.all()
+            lista = []
+            result = []
+            for key in var:
+                review = key.replace('.', ' ')
+                review = shlex.split(review)
+                if (review[0] == 'Review'):
+                    lista.append(var[key])
+            for elem in lista:
+                if (elem.place_id == self.id):
+                    result.append(elem)
+            return (result)
 
         @property
         def amenities(self):
-            """Getter method to retrieve related Amenity instances."""
-            from models import storage
-            dic = storage.all('Amenity')
-            return [].append(v for k,
-                             v in dic.items() if self.id == v['amenity_ids'])
+            """ getter returns list of amenities """
+            return self.amenity_ids
 
         @amenities.setter
-        def amenities(self, obj):
-            if isinstance(obj, Amenity):
-                self.amenity_ids.append(obj.id)
+        def amenities(self, obj=None):
+            """Set amenity_ids
+            """
+            if type(obj).__name__ == 'Amenity':
+                new_amenity = 'Amenity' + '.' + obj.id
+                self.amenity_ids.append(new_amenity)

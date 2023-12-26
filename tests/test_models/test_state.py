@@ -1,11 +1,11 @@
 #!/usr/bin/python3
-""" """
+"""test for state"""
 from tests.test_models.test_base_model import test_basemodel
 from models.state import State
 
 
 class test_state(test_basemodel):
-    """ """
+    """this will test the state class"""
 
     def __init__(self, *args, **kwargs):
         """ """
