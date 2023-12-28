@@ -15,8 +15,10 @@ def teardown_db(self):
 @app.route('/states_list', strict_slashes=False)
 def states_list():
     """ display a HTML page: (inside the tag BODY) """
+    states = storage.all("State").values()
+    sorted_states = sorted(states, key=lambda k: k.name)
     return render_template('7-states_list.html',
-                           states=storage.all("State").values())
+                           states=sorted_states)
 
 
 if __name__ == "__main__":
