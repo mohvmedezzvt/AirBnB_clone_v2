@@ -2,7 +2,6 @@
 """ a script that starts a Flask web application """
 from flask import Flask, render_template
 from models import storage
-from models.state import State
 
 app = Flask(__name__)
 
@@ -16,10 +15,9 @@ def teardown_db(self):
 @app.route('/states_list', strict_slashes=False)
 def states_list():
     """ display a HTML page: (inside the tag BODY) """
-    states = storage.all("State").values()
-    sorted_states = sorted(states, key=lambda k: k.name)
+    states = storage.all()
     return render_template('7-states_list.html',
-                           states=sorted_states)
+                           states=states)
 
 
 if __name__ == "__main__":
