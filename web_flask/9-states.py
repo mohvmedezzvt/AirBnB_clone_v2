@@ -23,8 +23,8 @@ def states():
 @app.route('/states/<id>', strict_slashes=False)
 def states_id(id):
     """ display a HTML page """
-    states = storage.all(State)
-    for state in states.values():
+    states = storage.all(State).values()
+    for state in states:
         if state.id == id:
             return render_template('9-states.html', state=state, mode='cities')
     return render_template('9-states.html', state=None, mode='none')
