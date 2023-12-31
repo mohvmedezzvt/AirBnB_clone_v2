@@ -17,7 +17,9 @@ def teardown_db(self):
 def states():
     """ display a HTML page """
     states = storage.all(State)
-    return render_template('9-states.html', states=states, mode='states')
+    return render_template('9-states.html',
+                           states=states,
+                           mode='states')
 
 
 @app.route('/states/<id>', strict_slashes=False)
@@ -26,8 +28,12 @@ def states_id(id):
     states = storage.all(State).values()
     for state in states:
         if state.id == id:
-            return render_template('9-states.html', state=state, mode='cities')
-    return render_template('9-states.html', state=None, mode='none')
+            return render_template('9-states.html',
+                                   states=state,
+                                   mode='cities')
+    return render_template('9-states.html',
+                           states=state,
+                           mode='none')
 
 
 if __name__ == "__main__":
